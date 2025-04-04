@@ -1,0 +1,683 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}NeonCode.Ai{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Three.js and related loaders -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- Custom CSS -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: rgb(212, 214, 177);
+            --text-color: #333333;
+            --card-bg: #f8f9fa;
+            --border-color: #dee2e6;
+            --hover-bg: #e9ecef;
+            --navbar-bg: #f8f9fa;
+            --navbar-text: #333333;
+            --navbar-hover: #e9ecef;
+            --primary-color: #0d6efd;
+            --primary-hover: #0b5ed7;
+            --secondary-text: #6c757d;
+            --link-color: #0d6efd;
+            --link-hover: #0b5ed7;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --text-color: #ffffff;
+            --card-bg: #1e1e1e;
+            --border-color: #2d2d2d;
+            --hover-bg: #2d2d2d;
+            --navbar-bg: #1e1e1e;
+            --navbar-text: #ffffff;
+            --navbar-hover: #2d2d2d;
+            --primary-color: #0d6efd;
+            --primary-hover: #0b5ed7;
+            --secondary-text: #b0b0b0;
+            --link-color: #4dabf7;
+            --link-hover: #74c0fc;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .navbar {
+            position: relative;
+            z-index: 2;
+            background-color: var(--navbar-bg) !important;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            pointer-events: auto;
+        }
+
+        .navbar-brand, .nav-link {
+            color: var(--navbar-text) !important;
+        }
+
+        .nav-link:hover {
+            background-color: var(--navbar-hover);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary-color);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            margin-left: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--primary-hover);
+            transform: scale(1.1);
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--navbar-text);
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: var(--navbar-hover);
+            color: var(--navbar-text);
+        }
+
+        .navbar-toggler {
+            border-color: var(--border-color);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(0, 0, 0, 0.55)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        [data-theme="dark"] .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.55)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        /* Dark mode specific styles */
+        [data-theme="dark"] .text-muted {
+            color: var(--secondary-text) !important;
+        }
+
+        [data-theme="dark"] .form-control {
+            background-color: transparent;
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        [data-theme="dark"] .form-control:focus {
+            background-color: transparent;
+            border-color: var(--primary-color);
+            color: var(--text-color);
+        }
+
+        [data-theme="dark"] .form-label {
+            color: var(--text-color);
+        }
+
+        /* Add placeholder color styles */
+        [data-theme="dark"] .form-control::placeholder {
+            color: white;
+            opacity: 0.7;
+        }
+
+        [data-theme="dark"] .form-control::-webkit-input-placeholder {
+            color: white;
+            opacity: 0.7;
+        }
+
+        [data-theme="dark"] .form-control::-moz-placeholder {
+            color: white;
+            opacity: 0.7;
+        }
+
+        [data-theme="dark"] .form-control:-ms-input-placeholder {
+            color: white;
+            opacity: 0.7;
+        }
+
+        [data-theme="dark"] a {
+            color: var(--link-color);
+        }
+
+        [data-theme="dark"] a:hover {
+            color: var(--link-hover);
+        }
+
+        [data-theme="dark"] .btn-outline-secondary {
+            color: var(--text-color);
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .btn-outline-secondary:hover {
+            background-color: var(--hover-bg);
+            color: var(--text-color);
+        }
+
+        [data-theme="dark"] .alert {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        [data-theme="dark"] .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+
+        /* 3D Scene Container */
+        #scene-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 100;
+            pointer-events: none;
+            background-color: transparent;
+            overflow: hidden;
+        }
+
+        /* Make the canvas element interactive */
+        #scene-container canvas {
+            pointer-events: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 101;
+            background-color: transparent;
+            min-height: 100vh;
+            pointer-events: auto;
+        }
+
+        /* Dark mode specific styles for 3D scene */
+        [data-theme="dark"] #scene-container {
+            background-color: transparent;
+        }
+
+        /* Add overlay to make content more visible */
+        .content-wrapper::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            opacity: 0.3;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Ensure navbar stays on top */
+        .navbar {
+            position: relative;
+            z-index: 102;
+            background-color: transparent !important;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            pointer-events: auto;
+        }
+
+        /* Ensure main content stays on top */
+        main.container {
+            position: relative;
+            z-index: 101;
+            pointer-events: auto;
+            background-color: transparent;
+        }
+
+        /* Ensure footer stays on top */
+        footer {
+            position: relative;
+            z-index: 101;
+            pointer-events: auto;
+            background-color: transparent;
+        }
+
+        /* Make cards transparent */
+        .card {
+            background-color: transparent;
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        /* Make alerts transparent */
+        .alert {
+            background-color: transparent;
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        /* Make form controls transparent */
+        .form-control {
+            background-color: transparent;
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        /* Make buttons transparent */
+        .btn {
+            background-color: transparent;
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Cursor styles */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Custom cursor -->
+    <div class="cursor"></div>
+    
+    <!-- 3D Scene Container -->
+    <div id="scene-container"></div>
+    
+    <div class="content-wrapper">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" href="{% url 'generator:home' %}">
+                    <i class="fas fa-magic me-2"></i>NeonCode.Ai
+                </a>
+                <div class="d-flex align-items-center">
+                    <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+                        <i class="fas fa-sun"></i>
+                    </button>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'generator:home' %}">
+                                    <i class="fas fa-home me-1"></i>Home
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'generator:image_history' %}">
+                                    <i class="fas fa-history me-1"></i>History
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'generator:favorites' %}">
+                                    <i class="fas fa-heart me-1"></i>Favorites
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                    <ul class="navbar-nav">
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <span class="nav-link">
+                                    <i class="fas fa-user me-1"></i>{{ user.username }}
+                                </span>
+                            </li>
+                            <li class="nav-item">
+                                <form method="post" action="{% url 'logout' %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="logout-btn">
+                                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'login' %}">
+                                    <i class="fas fa-sign-in-alt me-1"></i>Login
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'register' %}">
+                                    <i class="fas fa-user-plus me-1"></i>Register
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="container my-4">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer mt-auto py-3">
+            <div class="container text-center">
+                <span>© 2024 NeonCode.Ai. All rights reserved.</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{% static 'js/main.js' %}"></script>
+    <!-- Three.js Scene Script -->
+    <script>
+        // Create the scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.setClearColor(0x000000, 0); // Ensure transparent background
+        document.getElementById('scene-container').appendChild(renderer.domElement);
+
+        // Add lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(1, 1, 1);
+        scene.add(directionalLight);
+
+        // Add spotlight for shine effect
+        const spotLight = new THREE.SpotLight(0xffffff, 1.5);
+        spotLight.angle = Math.PI / 6;
+        spotLight.penumbra = 0.5;
+        spotLight.decay = 2;
+        spotLight.distance = 100;
+        scene.add(spotLight);
+
+        // Add orbit controls
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enableZoom = false;
+        controls.minDistance = 3;
+        controls.maxDistance = 3;
+        controls.enablePan = false;
+        controls.maxPolarAngle = Math.PI / 2;
+        controls.minPolarAngle = Math.PI / 2;
+        controls.enableRotate = true;
+
+        // Initialize GLTF and Draco loaders
+        const dracoLoader = new THREE.DRACOLoader();
+        dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+        
+        const loader = new THREE.GLTFLoader();
+        loader.setDRACOLoader(dracoLoader);
+        
+        let model;
+        let currentRotation = new THREE.Vector2();
+        let targetRotation = new THREE.Vector2();
+        let stripRotation = new THREE.Vector2();
+
+        // Show loading message
+        const loadingDiv = document.createElement('div');
+        loadingDiv.style.position = 'fixed';
+        loadingDiv.style.top = '50%';
+        loadingDiv.style.left = '50%';
+        loadingDiv.style.transform = 'translate(-50%, -50%)';
+        loadingDiv.style.color = 'var(--text-color)';
+        loadingDiv.style.zIndex = '1000';
+        loadingDiv.textContent = 'Loading 3D model...';
+        document.body.appendChild(loadingDiv);
+
+        // Load the model
+        loader.load(
+            '{% static "models/s2wt_kamdo_industrial_divinities-transformed.glb" %}',
+            function (gltf) {
+                model = gltf.scene;
+                scene.add(model);
+
+                // Find the head and strip meshes in the model
+                let headMesh = null;
+                let stripMeshes = [];
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        if (child.name.toLowerCase().includes('head')) {
+                            headMesh = child;
+                        } else if (child.name.toLowerCase().includes('strip')) {
+                            stripMeshes.push(child);
+                        }
+                        // Add material properties for shine effect
+                        child.material.metalness = 0.5;
+                        child.material.roughness = 0.5;
+                        child.material.needsUpdate = true;
+                    }
+                });
+
+                // Center the model
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                model.position.sub(center);
+
+                // Scale the model to fit the view
+                const size = box.getSize(new THREE.Vector3());
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const scale = 2 / maxDim;
+                model.scale.multiplyScalar(scale);
+
+                // Position the camera and adjust clipping planes
+                camera.position.z = 3;
+                camera.near = 0.1;
+                camera.far = 1000;
+                camera.updateProjectionMatrix();
+
+                // Set renderer size and pixel ratio
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(window.devicePixelRatio);
+                renderer.setClearColor(0x000000, 0);
+
+                // Remove loading message
+                document.body.removeChild(loadingDiv);
+
+                // Function to update robot colors based on theme
+                function updateRobotColors(theme) {
+                    model.traverse((child) => {
+                        if (child.isMesh) {
+                            if (theme === 'dark') {
+                                // Dark theme colors
+                                if (child.name.toLowerCase().includes('head')) {
+                                    child.material.color.setHex(0x4d4d4d);
+                                    child.material.metalness = 0.7; // More metallic in dark mode
+                                } else if (child.name.toLowerCase().includes('strip')) {
+                                    child.material.color.setHex(0x666666);
+                                    child.material.metalness = 0.6;
+                                } else {
+                                    child.material.color.setHex(0x333333);
+                                    child.material.metalness = 0.5;
+                                }
+                            } else {
+                                // Light theme colors
+                                if (child.name.toLowerCase().includes('head')) {
+                                    child.material.color.setHex(0xcccccc);
+                                    child.material.metalness = 0.3; // Less metallic in light mode
+                                } else if (child.name.toLowerCase().includes('strip')) {
+                                    child.material.color.setHex(0x999999);
+                                    child.material.metalness = 0.4;
+                                } else {
+                                    child.material.color.setHex(0xffffff);
+                                    child.material.metalness = 0.5;
+                                }
+                            }
+                            child.material.needsUpdate = true;
+                        }
+                    });
+                }
+
+                // Theme change handler
+                const themeToggle = document.getElementById('themeToggle');
+                const html = document.documentElement;
+                const icon = themeToggle.querySelector('i');
+
+                // Check for saved theme preference
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                html.setAttribute('data-theme', savedTheme);
+                updateIcon(savedTheme);
+                updateRobotColors(savedTheme); // Update robot colors on initial load
+
+                themeToggle.addEventListener('click', () => {
+                    const currentTheme = html.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                    
+                    html.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    updateIcon(newTheme);
+                    updateRobotColors(newTheme); // Update robot colors on theme change
+                });
+
+                function updateIcon(theme) {
+                    icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+                }
+
+                // Mouse movement tracking for shine effect
+                const mouse = new THREE.Vector2();
+                const raycaster = new THREE.Raycaster();
+                let shineTarget = new THREE.Vector3();
+                let currentShinePosition = new THREE.Vector3();
+                const shineSpeed = 0.1; // Adjust this value to control smoothness (lower = smoother)
+
+                document.addEventListener('mousemove', (event) => {
+                    // Calculate mouse position in normalized device coordinates
+                    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+                    // Update raycaster
+                    raycaster.setFromCamera(mouse, camera);
+
+                    // Find intersection with model
+                    if (model) {
+                        const intersects = raycaster.intersectObject(model, true);
+                        if (intersects.length > 0) {
+                            shineTarget.copy(intersects[0].point);
+                            shineTarget.z += 2; // Offset the light position
+                        }
+                    }
+
+                    // Update target rotation based on mouse position (X only)
+                    targetRotation.x = mouse.x * 0.5;
+                    targetRotation.y = 0; // No vertical movement
+                    stripRotation.x = mouse.x * 0.3; // Reduced rotation for strips
+                    stripRotation.y = 0; // No vertical movement
+
+                    // Update custom cursor position
+                    const cursor = document.querySelector('.cursor');
+                    cursor.style.left = event.clientX + 'px';
+                    cursor.style.top = event.clientY + 'px';
+                });
+
+                // Animation
+                function animate() {
+                    requestAnimationFrame(animate);
+                    
+                    // Smoothly interpolate shine position
+                    currentShinePosition.lerp(shineTarget, shineSpeed);
+                    spotLight.position.copy(currentShinePosition);
+                    
+                    if (headMesh) {
+                        // Smoothly interpolate current rotation to target rotation
+                        currentRotation.x += (targetRotation.x - currentRotation.x) * 0.1;
+                        currentRotation.y = 0;
+
+                        // Apply rotation to head mesh (X only)
+                        headMesh.rotation.y = currentRotation.x;
+                        headMesh.rotation.x = 0;
+                        headMesh.rotation.z = 0;
+                    }
+
+                    // Apply rotation to strip meshes (X only)
+                    stripMeshes.forEach(strip => {
+                        strip.rotation.y = stripRotation.x;
+                        strip.rotation.x = 0;
+                        strip.rotation.z = 0;
+                    });
+
+                    // Update orbit controls
+                    controls.update();
+                    
+                    renderer.render(scene, camera);
+                }
+
+                // Start animation
+                animate();
+            },
+            function (xhr) {
+                loadingDiv.textContent = `Loading 3D model... ${Math.round((xhr.loaded / xhr.total) * 100)}%`;
+            },
+            function (error) {
+                console.error('An error happened', error);
+                loadingDiv.textContent = 'Error loading 3D model. Please check console for details.';
+                loadingDiv.style.color = 'red';
+            }
+        );
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Image Details - AI Image Generator{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="card-title mb-0">Generated Image</h2>
+                    <div>
+                        <a href="{% url 'generator:toggle_favorite' image.id %}" class="btn btn-outline-danger">
+                            <i class="fas {% if image.is_favorite %}fa-heart{% else %}fa-heart{% endif %}"></i>
+                        </a>
+                        <a href="{{ image.image_url }}" class="btn btn-outline-primary" download>
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="text-center mb-4">
+                    <img src="{{ image.image_url }}" class="img-fluid rounded" alt="{{ image.prompt }}">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Prompt</h5>
+                        <p class="text-muted">{{ image.prompt }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Style</h5>
+                        <p class="text-muted">{{ image.style }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Resolution</h5>
+                        <p class="text-muted">{{ image.resolution }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Generated On</h5>
+                        <p class="text-muted">{{ image.created_at|date:"F d, Y H:i" }}</p>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="{% url 'generator:home' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

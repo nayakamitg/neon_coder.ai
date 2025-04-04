@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Favorites - AI Image Generator{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="card-title mb-0">Favorite Images</h2>
+                    <a href="{% url 'generator:home' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Generate New Image
+                    </a>
+                </div>
+
+                {% if images %}
+                    <div class="row g-4">
+                        {% for image in images %}
+                            <div class="col-md-4 col-lg-3">
+                                <div class="card h-100">
+                                    <img src="{{ image.image_url }}" class="card-img-top" alt="{{ image.prompt }}">
+                                    <div class="card-body">
+                                        <p class="card-text small text-truncate">{{ image.prompt }}</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">{{ image.created_at|date:"M d, Y" }}</small>
+                                            <div>
+                                                <a href="{% url 'generator:image_detail' image.id %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{{ image.image_url }}" class="btn btn-sm btn-outline-success" download>
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-heart fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No favorite images yet. Start by generating some images and marking them as favorites!</p>
+                        <a href="{% url 'generator:home' %}" class="btn btn-primary">
+                            <i class="fas fa-magic me-2"></i>Generate Image
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
