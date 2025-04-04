@@ -2,7 +2,7 @@
 
 A modern AI-powered image generation platform with an interactive 3D interface. Built with Django, Three.js, and powered by AI image generation capabilities.
 
-![NeonCode.Ai Screenshot](screenshots/screenshot.png)
+![NeonCode.Ai Screenshot]()
 
 ## Features
 
@@ -34,8 +34,8 @@ A modern AI-powered image generation platform with an interactive 3D interface. 
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/NeonCode.Ai.git
-cd NeonCode.Ai
+git clone https://github.com/nayakamitg/ai_image_generator.git
+cd ai_image_generator
 ```
 
 2. Create and activate a virtual environment:
@@ -134,6 +134,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-Your Name - [@yourtwitter](https://twitter.com/yourtwitter)
-
-Project Link: [https://github.com/yourusername/NeonCode.Ai](https://github.com/yourusername/NeonCode.Ai) 
+Name - [@YouTube](https://www.youtube.com/@neoncoderai)
+# SUBSCRIBE
